@@ -16,26 +16,26 @@ void generate_C_code(const DFA& dfa, const vector<string>& p1Vec, const vector<s
 
 int main()
 {
-    unordered_map<string, string> regdMap;
-    vector<RERule> regexRulesVec;
-    vector<string> regedTermsVec, leadingConstantsVec, trailingConstantsVec;
-    NFA finalNFA;
-    cout << read_parse_lex_file("lex.l", regedTermsVec, regdMap, regexRulesVec, leadingConstantsVec, trailingConstantsVec) << endl;
-    cout << parse_regex(regexRulesVec, regedTermsVec, regdMap);
-    cout << endl;
-   /* for (auto s : leadingConstantsVec) cout << s << endl;
-    for (auto pair : regdMap) {
-        cout << pair.first << " " << pair.second << endl;
-    }
-    cout << endl;
-    for (auto r : regexRulesVec) {
-        cout << r.regex << " ";
-        for (auto v : r.actions) {
-            cout << v << endl;
-        }
-    }
-    cout << endl;
-    for (auto s : trailingConstantsVec) cout << s << endl;*/
+	unordered_map<string, string> regdMap;
+	vector<RERule> regexRulesVec;
+	vector<string> regedTermsVec, leadingConstantsVec, trailingConstantsVec;
+	NFA finalNFA;
+	cout << read_parse_lex_file("lex.l", regedTermsVec, regdMap, regexRulesVec, leadingConstantsVec, trailingConstantsVec) << endl;
+	cout << parse_regex(regexRulesVec, regedTermsVec, regdMap);
+	cout << endl;
+	/* for (auto s : leadingConstantsVec) cout << s << endl;
+	 for (auto pair : regdMap) {
+		 cout << pair.first << " " << pair.second << endl;
+	 }
+	 cout << endl;
+	 for (auto r : regexRulesVec) {
+		 cout << r.regex << " ";
+		 for (auto v : r.actions) {
+			 cout << v << endl;
+		 }
+	 }
+	 cout << endl;
+	 for (auto s : trailingConstantsVec) cout << s << endl;*/
 
-    convert_rules_2_NFA(regexRulesVec, finalNFA);
+	convert_rules_2_NFA(regexRulesVec, finalNFA);
 }
