@@ -17,4 +17,6 @@
 #include <fstream>
 #include <queue>
 #include <stack>
+#include <algorithm>
+#include <map>
 #endif //PCH_H

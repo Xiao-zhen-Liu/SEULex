@@ -1,8 +1,5 @@
 #include "Common.h"
-#include <queue>
-#include <vector>
-#include <stack>
-#include <algorithm>
+#include "pch.h"
 
 using std::unordered_map;
 using std::unordered_set;
@@ -54,7 +51,7 @@ DFA最小化算法二：
 
 */
 
-void dfa_minimize(const DFA& DFA_origin, DFA& DFA_minimum) 
+void minimize_DFA(const DFA& DFA_origin, DFA& DFA_minimum) 
 {
 	split_to_sets(DFA_origin);//划分
 

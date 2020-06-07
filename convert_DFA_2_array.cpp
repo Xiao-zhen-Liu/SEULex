@@ -1,8 +1,5 @@
 #include "Common.h"
-#include <queue>
-#include <vector>
-#include <stack>
-#include <algorithm>
+#include "pch.h"
 
 using std::unordered_map;
 using std::unordered_set;
@@ -23,8 +20,10 @@ void convert_DFA_2_array(const DFA& dfa, vector<pair<int*, int>>& arrays, vector
 	const int set_size = allset.size();
 
 	//建立四个表：
-	//1、ec表：索引char的ascii码，值是对应的列数
-	int* ec = new int[256];
+
+	//1、ec表：该表用于将字符的ascii码映射为DFA状态转化表中的列数。
+	//索引为char的ascii码，值是对应的列号。
+	int* ec = new int[256];//建表
 	memset(ec, 0, 256 * sizeof(int));
 	//从下标为1开始给char标值，0代表非法字符
 	for (int i = 0; i < set_size; ++i)
@@ -53,9 +52,9 @@ void convert_DFA_2_array(const DFA& dfa, vector<pair<int*, int>>& arrays, vector
 	}
 	for (int i = 0; i < dfa.statesMap.size(); i++)
 	{
-		base[dfa.statesVec[i].number] = i * (set_size + 1);
-		for (auto it = dfa.statesVec[i].exEdgesMap.begin(); it != dfa.statesVec[i].exEdgesMap.end(); it++) {
-			next[base[dfa.statesVec[i].number] + ec[int(it->first)]] = it->second;
+		base[statesVec[i].number] = i * (set_size + 1);
+		for (auto it = statesVec[i]..begin(); it != statesVec[i].exEdgesMap.end(); it++) {
+			next[base[statesVec[i].number] + ec[int(it->first)]] = it->second;
 		}
 	}
 	arrays.push_back(pair<int*, int>(base, DFA_size));
@@ -65,14 +64,13 @@ void convert_DFA_2_array(const DFA& dfa, vector<pair<int*, int>>& arrays, vector
 	int* accept = new int[DFA_size];
 	memset(accept, 0, DFA_size * sizeof(int));
 
-	int numOfend = 0;
+	int numOfend = 0;//计数
 	for (auto it = dfa.endStatesMap.begin(); it != dfa.endStatesMap.end(); ++it)
 	{
 		accept[it->first] = numOfend + 1;
 		endVec.push_back(rules[it->second]);
-		++numOfend;
+		++numOfend;//计数
 	}
 
 	arrays.push_back(pair<int*, int>(accept, DFA_size));
-
 }
