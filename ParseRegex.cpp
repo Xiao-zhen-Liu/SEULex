@@ -442,9 +442,7 @@ bool parse_regex(vector<RERule>& rulesVec, const vector<string>& regedTermsVec, 
 	for (auto &r : rulesVec) {
 		if (!process_double_quotation_marks(r.regex)) return false;
 		if (!process_curly_brackets(r.regex, termsMap)) return false;
-		cout << r.regex << endl;
 		if (!process_square_brackets(r.regex)) return false;
-		cout << r.regex << endl;
 		process_match_all(r.regex);
 		if (!process_special_operators(r.regex)) return false;
 		add_dot_splitter(r.regex);

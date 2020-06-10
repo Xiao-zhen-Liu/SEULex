@@ -51,8 +51,6 @@ int main(int argc, char** argv)
 	}
 
 	if (read_parse_lex_file("lex.l", regedTermsVec, regdMap, regexRulesVec, codeBegin, codeEnd)) cout << "Finished Lex File Reading." << endl;
-	cout << codeBegin;
-	cout << codeEnd;
 	if (parse_regex(regexRulesVec, regedTermsVec, regdMap)) cout << "Finished Regex parsing." << endl;
 	/* for (auto s : leadingConstantsVec) cout << s << endl;
 	 for (auto pair : regdMap) {
