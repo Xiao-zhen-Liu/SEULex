@@ -99,7 +99,7 @@ void nextLine(ifstream& inStm, string& lineBuf, int& lineNum, string& tempLine, 
 	lineBuf = rtrim(lineBuf);
 }
 
-bool read_parse_lex_file(string path, vector<string>& regedTermsVec, unordered_map<string, string>& regdMap, vector<RERule>& regexRulesVec, vector<string>& leadingConstantsVec, vector<string>& trailingConstantsVec)
+bool read_parse_lex_file(string path, vector<string>& regedTermsVec, unordered_map<string, string>& regdMap, vector<RERule>& regexRulesVec, string& codeBegin, string& codeEnd)
 {
 	ifstream inStm;
 	inStm.open(path);
@@ -119,9 +119,13 @@ bool read_parse_lex_file(string path, vector<string>& regedTermsVec, unordered_m
 	vector<string> actions;
 
 	while (!inStm.eof() && !error) {
-
-		nextLine(inStm, lineBuf, lineNum, tempLine, error);
-		if (lineBuf.empty()) continue;
+		if (state == CONSTANT_DECLARATIONS || state == AUXILIARY_FUNCTIONS) {
+			getline(inStm, lineBuf), lineNum++;
+		}
+		else {
+			nextLine(inStm, lineBuf, lineNum, tempLine, error);
+			if (lineBuf.empty()) continue;
+		}
 
 		switch (state)
 		{
@@ -133,14 +137,13 @@ bool read_parse_lex_file(string path, vector<string>& regedTermsVec, unordered_m
 			}
 			break;
 		case CONSTANT_DECLARATIONS:
-			do { 
-				leadingConstantsVec.push_back(lineBuf);
-				nextLine(inStm, lineBuf, lineNum, tempLine, error);
-			} while (lineBuf.compare("%}") != 0 && !inStm.eof());
 			if (lineBuf.compare("%}") == 0) state = REGULAR_DEFINITIONS;
-			else {
+			else if (inStm.eof()) {
 				cout << "ERROR: No exit token <%}> after constant declarations." << endl;
 				error = true;
+			}
+			else {
+				codeBegin += lineBuf + "\n";
 			}
 			break;
 		case REGULAR_DEFINITIONS:
@@ -182,7 +185,7 @@ bool read_parse_lex_file(string path, vector<string>& regedTermsVec, unordered_m
 			}
 			break;
 		case AUXILIARY_FUNCTIONS:
-			trailingConstantsVec.push_back(lineBuf);
+			codeEnd += lineBuf + "\n";
 			break;
 		default:
 			break;

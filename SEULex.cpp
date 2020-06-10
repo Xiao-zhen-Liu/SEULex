@@ -7,14 +7,14 @@ using namespace std;
 
 // Predefinitions
 
-bool read_parse_lex_file(string path, vector<string>& regedTermsVec, unordered_map<string, string>& regdMap, vector<RERule>& regexRulesVec, vector<string>& leadingConstantsVec, vector<string>& trailingConstantsVec);
+bool read_parse_lex_file(string path, vector<string>& regedTermsVec, unordered_map<string, string>& regdMap, vector<RERule>& regexRulesVec, string& codeBegin, string& codeEnd);
 bool parse_regex(vector<RERule>& rulesVec, const vector<string>& regedTermsVec, unordered_map<string, string>& termsMap);
 void convert_rules_2_NFA(vector<RERule>& rulesVec, NFA& nfa);
 void convert_NFA_2_DFA(NFA& nfa, DFA& dfa);
 void minimize_DFA(const DFA& DFA_origin, DFA& DFA_minimum);
 void convert_DFA_2_array(const DFA& dfa, vector<pair<int*, int>>& arrays, vector<vector<string>>& endVec);
 //void generate_C_code(const DFA& dfa, const vector<string>& p1Vec, const vector<string>& p4Vec);
-int generate_C_code(vector<pair<int*, int>>& arrays, vector<vector<string>>& endVec, vector<string>& part1, vector<string>& part4, int startState, int mode);
+int generate_C_code(vector<pair<int*, int>>& arrays, vector<vector<string>>& endVec, string& codeBegin, string& codeEnd, int startState, int mode);
 
 vector<RERule> regexRulesVec;
 
@@ -26,9 +26,8 @@ int main(int argc, char** argv)
 	DFA originDFA;
 	DFA minimunDFA;
 	int mode = -1;
-	string input;
+	string input, codeBegin, codeEnd;
 	map<string, string> terms;
-	vector<string>part1, part4;
 	vector<pair<int*, int>> arrays;//<表（指针），表的大小>
 	vector<vector<string>> endVec;
 
@@ -51,9 +50,10 @@ int main(int argc, char** argv)
 		return -1;
 	}
 
-	cout << read_parse_lex_file("lex.l", regedTermsVec, regdMap, regexRulesVec, leadingConstantsVec, trailingConstantsVec) << endl;
-	cout << parse_regex(regexRulesVec, regedTermsVec, regdMap);
-	cout << endl;
+	if (read_parse_lex_file("lex.l", regedTermsVec, regdMap, regexRulesVec, codeBegin, codeEnd)) cout << "Finished Lex File Reading." << endl;
+	cout << codeBegin;
+	cout << codeEnd;
+	if (parse_regex(regexRulesVec, regedTermsVec, regdMap)) cout << "Finished Regex parsing." << endl;
 	/* for (auto s : leadingConstantsVec) cout << s << endl;
 	 for (auto pair : regdMap) {
 		 cout << pair.first << " " << pair.second << endl;
@@ -68,9 +68,9 @@ int main(int argc, char** argv)
 	 cout << endl;
 	 for (auto s : trailingConstantsVec) cout << s << endl;*/
 
-	convert_rules_2_NFA(regexRulesVec, finalNFA);
-	convert_NFA_2_DFA(finalNFA, originDFA);
-	minimize_DFA(originDFA,minimunDFA);
-	convert_DFA_2_array(minimunDFA,arrays,endVec);
-	generate_C_code(arrays, endVec, part1, part4, minimunDFA.startState, mode);
+	convert_rules_2_NFA(regexRulesVec, finalNFA); cout << "Finished converting to NFA." << endl;
+	convert_NFA_2_DFA(finalNFA, originDFA); cout << "Finished converting to DFA." << endl;
+	minimize_DFA(originDFA,minimunDFA); cout << "Finished DFA minimization." << endl;
+	convert_DFA_2_array(minimunDFA,arrays,endVec); cout << "Finished DFA to array." << endl;
+	generate_C_code(arrays, endVec, codeBegin, codeEnd, minimunDFA.startState, mode); cout << "Finished generating C code." << endl;
 }

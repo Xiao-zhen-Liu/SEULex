@@ -10,7 +10,7 @@ static void print_array(string name, int size, const int* value, ofstream& out);
 
 
 /*生成.c文件,arrays为包含多个相关数组的容器，endVec为终态对应的动作*/
-int generate_C_code(vector<pair<int*, int>>& arrays, vector<vector<string>>& endVec, vector<string>& part1, vector<string>& part4, int startState, int mode)
+int generate_C_code(vector<pair<int*, int>>& arrays, vector<vector<string>>& endVec, string& codeBegin, string& codeEnd, int startState, int mode)
 {
 	ofstream out;
 	if (mode == 0)
@@ -33,11 +33,8 @@ int generate_C_code(vector<pair<int*, int>>& arrays, vector<vector<string>>& end
 
 	out << "#include<string.h>" << endl;
 	out << "#define START_STATE " << startState << endl;
-	/*依次输出P1和P4*/
-	for (int i = 0; i < part1.size(); i++)
-	{
-		out << part1[i] << endl;
-	}
+	/*输出P1*/
+	out << codeBegin;
 	
 	/*函数声明*/
 	out << "char* getCharPtr(char* fileName);" << endl;
@@ -246,11 +243,7 @@ int generate_C_code(vector<pair<int*, int>>& arrays, vector<vector<string>>& end
 	out << "	return cp;" << endl;
 	out << "}" << endl;
 
-
-	for (int i = 0; i < part4.size(); i++)
-	{
-		out << part4[i] << endl;
-	}
+	out << codeEnd;
 
 	out.close();
 	return 0;
