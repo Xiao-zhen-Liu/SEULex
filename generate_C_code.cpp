@@ -28,7 +28,7 @@ int generate_C_code(vector<pair<int*, int>>& arrays, vector<vector<string>>& end
 	}
 	/*主函数的开始*/
 	out << "#define _CRT_SECURE_NO_WARNINGS" << endl;
-	out << "#include\"stdio.h\"" << endl;
+	//out << "#include\"stdio.h\"" << endl;
 	out << "#include\"stdlib.h\"" << endl;
 
 	out << "#include<string.h>" << endl;
@@ -40,7 +40,7 @@ int generate_C_code(vector<pair<int*, int>>& arrays, vector<vector<string>>& end
 	out << "char* getCharPtr(char* fileName);" << endl;
 	out << "int findAction(int action);" << endl; 
 	//out << "void addToken(int token);" << endl; /*将token加入Token序列*/
-	out << "void comment();" << endl; /*comment函数，啥都不做*/
+	//out << "void comment();" << endl; /*comment函数，啥都不做*/
 
 
 	/*依次输出ec表,base表,next表,accept表*/

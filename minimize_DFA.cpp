@@ -64,12 +64,12 @@ void minimize_DFA(const DFA& DFA_origin, DFA& DFA_minimum)
 	}
 	//…Ë÷√∆‰À˚◊¥Ã¨
 	vector<DFAState> statesVec;
+	for (int i = 0; i < DFA_origin.statesMap.size(); i++)
+	{
+		statesVec.push_back(DFA_origin.statesMap.find(i)->second);
+	}
 	for (int k = 0; k < statesSetsVec.size(); ++k)
 	{
-		for (int i = 0; i < DFA_origin.statesMap.size(); i++)
-		{
-			statesVec.push_back(DFA_origin.statesMap.find(i)->second);
-		}
 		auto& pivotState = statesVec[*statesSetsVec[k].cbegin()];
 		DFAState newState;
 		newState.num = k;
