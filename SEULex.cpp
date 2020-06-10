@@ -12,14 +12,15 @@ bool parse_regex(vector<RERule>& rulesVec, const vector<string>& regedTermsVec, 
 void convert_rules_2_NFA(vector<RERule>& rulesVec, NFA& nfa);
 void convert_NFA_2_DFA(NFA& nfa, DFA& dfa);
 void minimize_DFA(const DFA& DFA_origin, DFA& DFA_minimum);
-void convert_DFA_2_array(const DFA& dfa, vector<pair<int*, int>>& arrays, vector<RERule>& endVec);
+void convert_DFA_2_array(const DFA& dfa, vector<pair<int*, int>>& arrays, vector<vector<string>>& endVec);
 //void generate_C_code(const DFA& dfa, const vector<string>& p1Vec, const vector<string>& p4Vec);
-int generate_C_code(vector<pair<int*, int>>& arrays, vector<RERule>& endVec, vector<string>& part1, vector<string>& part4, int startState, int mode);
+int generate_C_code(vector<pair<int*, int>>& arrays, vector<vector<string>>& endVec, vector<string>& part1, vector<string>& part4, int startState, int mode);
+
+vector<RERule> regexRulesVec;
 
 int main(int argc, char** argv)
 {
 	unordered_map<string, string> regdMap;
-	vector<RERule> regexRulesVec;
 	vector<string> regedTermsVec, leadingConstantsVec, trailingConstantsVec;
 	NFA finalNFA;
 	DFA originDFA;
@@ -28,8 +29,8 @@ int main(int argc, char** argv)
 	string input;
 	map<string, string> terms;
 	vector<string>part1, part4;
-	vector<pair<int*, int>> arrays;
-	vector<RERule> endVec;
+	vector<pair<int*, int>> arrays;//<表（指针），表的大小>
+	vector<vector<string>> endVec;
 
 	if (argc == 2)//argc: 整数,用来统计运行程序时送给main函数的命令行参数的个数
 	{

@@ -2,6 +2,9 @@
 #ifndef COMMON_H
 #define COMMON_H
 
+#define LEX_TEST 0
+#define YACC_TEST 1
+
 #include "pch.h"
 
 constexpr auto EPSILON = '`';
@@ -55,7 +58,7 @@ struct DFAState
 struct DFA
 {
 	int startState;
-	std::unordered_map<int, std::vector<std::string>> finalStatesMap;
+	std::unordered_map<int, std::vector<std::string>> finalStatesMap;//存储终态和对应的动作
 	std::unordered_map<int, DFAState> statesMap;//DFA中结点的标号与其state的对应关系
 };
 

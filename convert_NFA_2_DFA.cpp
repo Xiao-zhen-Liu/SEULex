@@ -73,7 +73,7 @@ void e_closure(unordered_set<int>& NFAStatesSet, const unordered_map<int, NFASta
 			{
 				stack.push(new_item_num);
 				NFAStatesSet.emplace(new_item_num);
-				start += 1;
+				start++;
 			}
 		}
 	}
@@ -103,7 +103,7 @@ bool move(const unordered_set<int>& NFAStatesSet, const unordered_map<int, NFASt
 
 bool find_actions(const unordered_set<int>& NFAStatesSet, unordered_map<int, vector<string>>& finalStatesMap_NFA, string& actions)//参数1：DFA状态中的NFA状态；参数2：NFA中的终态<终态标号，对应的动作>；参数3：动作
 {
-	decltype(finalStatesMap_NFA.find(0)) endState_Iter;//最终选择的终态
+	decltype(finalStatesMap_NFA.find(0)) finalState_Iter;//最终选择的终态
 	bool find = false;//是否已经在这个DFA结点中找到了终态
 	for (const auto& NFAState : NFAStatesSet)//遍历DFA中所有的NFA结点的状态
 	{
@@ -112,26 +112,26 @@ bool find_actions(const unordered_set<int>& NFAStatesSet, unordered_map<int, vec
 		{
 			if (find) 
 			{
-				if (endState_Iter->first > Iter->first)//如果有位置更靠前的，更新终态的选择
-					endState_Iter = Iter;
+				if (finalState_Iter->first > Iter->first)//如果有位置更靠前的，更新终态的选择
+					finalState_Iter = Iter;
 			}
 			else 
 			{
-				endState_Iter = Iter;
+				finalState_Iter = Iter;
 				find = true;
 			}
 		}
 	}
 	if (find)//确定终态
 	{
-		actions = endState_Iter->second;//动作的选择
+		actions = finalState_Iter->second[0];//动作的选择
 		return true;
 	}
 	else return false;
 }
 
 //子集构造法的实现
-void convert_NFA_2_DFA(const NFA &nfa,DFA &dfa)
+void convert_NFA_2_DFA(NFA &nfa,DFA &dfa)
 {	
 	int Dcounter = 0;//给DFA状态编号用的
 	NFA_state_num = nfa.statesMap.size();
@@ -192,9 +192,11 @@ void convert_NFA_2_DFA(const NFA &nfa,DFA &dfa)
 					unmarked_DFAStates.push(newState.num);//新结点等待处理
 					//判断是否是终态并找确定终态对应动作
 					string actions;
-					if (find_actions(newState.NFAStatesSet, nfa.finalStatesMap, actions))//如果包含一个终态
+					if (find_actions(newState.NFAStatesSet, nfa.finalStatesMap, actions))//如果包含终态
 					{ 
-						dfa.finalStatesMap.insert(pair<int, string>(newState.num, actions));//决定这个dfa终态对应的动作
+						vector<string> act;
+						act.push_back(actions);
+						dfa.finalStatesMap.insert({ newState.num, act });//决定这个dfa终态对应的动作
 					}
 				}
 				dfa.statesMap[this_state].transitionTableMap.insert(pair<char, int>(inputC, next_state));//DFA图上加一条边

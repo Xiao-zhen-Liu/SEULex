@@ -10,7 +10,7 @@ static void print_array(string name, int size, const int* value, ofstream& out);
 
 
 /*生成.c文件,arrays为包含多个相关数组的容器，endVec为终态对应的动作*/
-int generate_C_code(vector<pair<int*, int>>& arrays, vector<RERule>& endVec, vector<string>& part1, vector<string>& part4, int startState, int mode)
+int generate_C_code(vector<pair<int*, int>>& arrays, vector<vector<string>>& endVec, vector<string>& part1, vector<string>& part4, int startState, int mode)
 {
 	ofstream out;
 	if (mode == 0)
@@ -59,13 +59,13 @@ int generate_C_code(vector<pair<int*, int>>& arrays, vector<RERule>& endVec, vec
 	}
 
 	/*定义变量*/
-	out << " int yy_current_state = START_STATE;" << endl;
-	out << " int yy_last_accepting_state = -1;" << endl;
-	out << " char *yy_cp = NULL;" << endl;
-	out << " char *yy_last_accepting_cpos = NULL;" << endl;
-	out << " int yy_act = 0;" << endl;
-	out << " int isEnd = 0;" << endl;
-	out << " int yy_c = -1;" << endl;
+	out << "int yy_current_state = START_STATE;" << endl;
+	out << "int yy_last_accepting_state = -1;" << endl;
+	out << "char *yy_cp = NULL;" << endl;
+	out << "char *yy_last_accepting_cpos = NULL;" << endl;
+	out << "int yy_act = 0;" << endl;
+	out << "int isEnd = 0;" << endl;
+	out << "int yy_c = -1;" << endl;
 	out << "int correct = 1;" << endl;
 
 
@@ -73,7 +73,7 @@ int generate_C_code(vector<pair<int*, int>>& arrays, vector<RERule>& endVec, vec
 	out << "void lex_init(char* fileName)" << endl;
 	out << "{" << endl;
 	/*调用char* getCharPtr(char* fileName)得到文件字符指针*/
-	out << "yy_cp = getCharPtr(fileName);" << endl;
+	out << "	yy_cp = getCharPtr(fileName);" << endl;
 	out << "}" << endl;
 
 	if (mode == YACC_TEST)
@@ -86,73 +86,73 @@ int generate_C_code(vector<pair<int*, int>>& arrays, vector<RERule>& endVec, vec
 	{
 		out << "int main(int argc,char** argv)" << endl;
 		out << "{" << endl;
-		out << "if(argc==2)" << endl;
-		out << "{" << endl;
-		out << "lex_init(argv[1]);" << endl;
-		out << "}" << endl;
-		out << "else{" << endl;
-		out << "printf(\"ERROR: invalid argument!\\n\");" << endl;
-		out << "return -1;" << endl;
-		out << "}" << endl;
+		out << "	if(argc==2)" << endl;
+		out << "	{" << endl;
+		out << "		lex_init(argv[1]);" << endl;
+		out << "	}" << endl;
+		out << "	else{" << endl;
+		out << "		printf(\"ERROR: invalid argument!\\n\");" << endl;
+		out << "		return -1;" << endl;
+		out << "	}" << endl;
 	}
 
 
-	out << "if (isEnd && correct)" << endl;
-	out << "{" << endl;
-	out << "	return -1;" << endl;
-	out << "}" << endl;
-	out << "else if (isEnd && !correct)" << endl;
-	out << "{" << endl;
-	out << "	return -2;" << endl;
-	out << "}" << endl;
-	out << "int result = 0;" << endl;
-	out << "while (*yy_cp != 0) {" << endl;
-	out << "	yy_c = yy_ec[(int)*yy_cp];" << endl;
-	out << "	if (yy_accept[yy_current_state])" << endl;
-	out << "	{" << endl;
-	out << "	yy_last_accepting_state = yy_current_state;" << endl;
-	out << "	yy_last_accepting_cpos = yy_cp;" << endl;
-	out << "	}" << endl;
-	out << "	if (yy_next[yy_base[yy_current_state] + yy_c] == -1 && yy_last_accepting_state != -1)" << endl;
-	out << "	{" << endl;
-	out << "	yy_current_state = yy_last_accepting_state;" << endl;
-	out << "	yy_cp = yy_last_accepting_cpos;" << endl;
-	out << "	yy_act = yy_accept[yy_current_state];" << endl;
-	out << "	result = findAction(yy_act);" << endl;
+	out << "		if (isEnd && correct)" << endl;
+	out << "		{" << endl;
+	out << "			return -1;" << endl;
+	out << "		}" << endl;
+	out << "		else if (isEnd && !correct)" << endl;
+	out << "		{" << endl;
+	out << "			return -2;" << endl;
+	out << "		}" << endl;
+	out << "		int result = 0;" << endl;
+	out << "		while (*yy_cp != 0) {" << endl;
+	out << "			yy_c = yy_ec[(int)*yy_cp];" << endl;
+	out << "			if (yy_accept[yy_current_state])" << endl;
+	out << "			{" << endl;
+	out << "				yy_last_accepting_state = yy_current_state;" << endl;
+	out << "				yy_last_accepting_cpos = yy_cp;" << endl;
+	out << "			}" << endl;
+	out << "			if (yy_next[yy_base[yy_current_state] + yy_c] == -1 && yy_last_accepting_state != -1)" << endl;
+	out << "			{" << endl;
+	out << "				yy_current_state = yy_last_accepting_state;" << endl;
+	out << "				yy_cp = yy_last_accepting_cpos;" << endl;
+	out << "				yy_act = yy_accept[yy_current_state];" << endl;
+	out << "				result = findAction(yy_act);" << endl;
 
 	if (mode == YACC_TEST)
 	{
-		out << "	if (result != -1)" << endl;
-		out << "	{" << endl;
-		out << "	yy_current_state = START_STATE;" << endl;
-		out << "	yy_last_accepting_state = -1;" << endl;
-		out << "	++yy_cp;" << endl;
-		out << "	yy_current_state = yy_next[yy_base[yy_current_state] + yy_c];" << endl;
-		out << "	break;" << endl;
-		out << "	}" << endl;
-		out << "	if (result == -1)" << endl;
-		out << "	{" << endl;
-		out << "	yy_current_state = START_STATE;" << endl;
-		out << "	yy_last_accepting_state = -1;" << endl;
-		out << "	++yy_cp;" << endl;
-		out << "	yy_current_state = yy_next[yy_base[yy_current_state] + yy_c];" << endl;
-		out << "	continue;" << endl;
-		out << "	}" << endl;
+		out << "				if (result != -1)" << endl;
+		out << "				{" << endl;
+		out << "					yy_current_state = START_STATE;" << endl;
+		out << "					yy_last_accepting_state = -1;" << endl;
+		out << "					++yy_cp;" << endl;
+		out << "					yy_current_state = yy_next[yy_base[yy_current_state] + yy_c];" << endl;
+		out << "					break;" << endl;
+		out << "				}" << endl;
+		out << "				if (result == -1)" << endl;
+		out << "				{" << endl;
+		out << "					yy_current_state = START_STATE;" << endl;
+		out << "					yy_last_accepting_state = -1;" << endl;
+		out << "					++yy_cp;" << endl;
+		out << "					yy_current_state = yy_next[yy_base[yy_current_state] + yy_c];" << endl;
+		out << "					continue;" << endl;
+		out << "				}" << endl;
 	}
 	else if (mode == LEX_TEST)
 	{
-		out << "		printf(\" \");" << endl;
-		out << "	yy_current_state = START_STATE;" << endl;
-		out << "	yy_last_accepting_state = -1;" << endl;
-		out << "	++yy_cp;" << endl;
-		out << "	yy_current_state = yy_next[yy_base[yy_current_state] + yy_c];" << endl;
-		out << "	continue;" << endl;
+		out << "				printf(\" \");" << endl;
+		out << "				yy_current_state = START_STATE;" << endl;
+		out << "				yy_last_accepting_state = -1;" << endl;
+		out << "				++yy_cp;" << endl;
+		out << "				yy_current_state = yy_next[yy_base[yy_current_state] + yy_c];" << endl;
+		out << "				continue;" << endl;
 
 	}
 
-	out << "	}" << endl;
-	out << "	if (yy_next[yy_base[yy_current_state] + yy_c] == -1 && yy_last_accepting_state == -1)" << endl;
-	out << "{" << endl;
+	out << "				}" << endl;
+	out << "					if (yy_next[yy_base[yy_current_state] + yy_c] == -1 && yy_last_accepting_state == -1)" << endl;
+	out << "				{" << endl;
 	out << "	printf(\"ERROR DETECTED IN INPUT FILE !\");" << endl;
 
 	if (mode == LEX_TEST)
@@ -198,7 +198,7 @@ int generate_C_code(vector<pair<int*, int>>& arrays, vector<RERule>& endVec, vec
 	/*int findAction(int action)函数*/
 	out << "int findAction(int action)" << endl;
 	out << "{" << endl;
-	out << "switch (action) " << endl;/*根据endVec打印switch语句*/
+	out << "	switch (action) " << endl;/*根据endVec打印switch语句*/
 	out << "{" << endl;
 	out << "case 0:" << endl;
 	/*...此处省略了一些东西*/
@@ -207,41 +207,43 @@ int generate_C_code(vector<pair<int*, int>>& arrays, vector<RERule>& endVec, vec
 	for (int i = 0; i < endVec.size(); i++)
 	{
 		out << "case " << i + 1 << ":" << endl;
-		for (int j = 0; j < endVec[i].actions.size(); j++)
+		for (int j = 0; j < endVec[i].size(); j++)
 		{
-			out << endVec[i].actions[j] << endl;
+			out << endVec[i][j] << endl;
 		}
 		out << "break;" << endl;
 	}
 
-	out << "default:" << endl;
-	out << "break;" << endl;
-	out << "}" << endl; /*int findAction(int state）函数的下括号*/
-	out << "return -1;" << endl;
-	out << "}" << endl;/*int findAction(int action)函数的下括号*/
+	out << "		default:" << endl;
+	out << "		break;" << endl;
+	out << "	}" << endl; /*int findAction(int state）函数的下括号*/
+	out << "	return -1;" << endl;
+	out << "	}" << endl; /*int findAction(int action)函数的下括号*/
+
+
 	/*char* getCharPtr(char* fileName)函数*/
 	out << "char* getCharPtr(char* fileName){" << endl;
-	out << "char* cp=NULL;" << endl;
-	out << "FILE *fp;" << endl;
-	out << "fp=fopen(fileName,\"r\");" << endl;
-	out << "if(fp==NULL)" << endl;
-	out << "{" << endl;
-	out << "printf(\"can't open file\");" << endl;
-	out << "exit(0);" << endl;
-	out << "}" << endl;
-	out << "fseek(fp,0,SEEK_END);" << endl;
-	out << "int flen = ftell(fp);" << endl; /* 得到文件大小 */
-	out << "cp = (char *)malloc(flen + 1);" << endl; /* 根据文件大小动态分配内存空间 */
-	out << "if (cp == NULL)" << endl;
-	out << "{" << endl;
-	out << "fclose(fp);" << endl;
-	out << "	return 0;" << endl;
-	out << "}" << endl;
-	out << "rewind(fp);" << endl; /* 定位到文件开头 */
-	out << "memset(cp,0,flen+1);" << endl;
-	out << "fread(cp, sizeof(char), flen, fp);" << endl; /* 一次性读取全部文件内容 */
-	out << "cp[flen] = 0; " << endl;/* 字符串结束标志 */
-	out << "return cp;" << endl;
+	out << "	char* cp=NULL;" << endl;
+	out << "	FILE *fp;" << endl;
+	out << "	fp=fopen(fileName,\"r\");" << endl;
+	out << "	if(fp==NULL)" << endl;
+	out << "	{" << endl;
+	out << "		printf(\"can't open file\");" << endl;
+	out << "		exit(0);" << endl;
+	out << "	}" << endl;
+	out << "	fseek(fp,0,SEEK_END);" << endl;
+	out << "	int flen = ftell(fp);" << endl; /* 得到文件大小 */
+	out << "	cp = (char *)malloc(flen + 1);" << endl; /* 根据文件大小动态分配内存空间 */
+	out << "	if (cp == NULL)" << endl;
+	out << "	{" << endl;
+	out << "		fclose(fp);" << endl;
+	out << "		return 0;" << endl;
+	out << "	}" << endl;
+	out << "	rewind(fp);" << endl; /* 定位到文件开头 */
+	out << "	memset(cp,0,flen+1);" << endl;
+	out << "	fread(cp, sizeof(char), flen, fp);" << endl; /* 一次性读取全部文件内容 */
+	out << "	cp[flen] = 0; " << endl;/* 字符串结束标志 */
+	out << "	return cp;" << endl;
 	out << "}" << endl;
 
 

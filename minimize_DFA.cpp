@@ -68,7 +68,7 @@ void minimize_DFA(const DFA& DFA_origin, DFA& DFA_minimum)
 	{
 		for (int i = 0; i < DFA_origin.statesMap.size(); i++)
 		{
-			statesVec.push_back(DFA_origin.statesMap[i]);
+			statesVec.push_back(DFA_origin.statesMap.find(i)->second);
 		}
 		auto& pivotState = statesVec[*statesSetsVec[k].cbegin()];
 		DFAState newState;
@@ -77,14 +77,21 @@ void minimize_DFA(const DFA& DFA_origin, DFA& DFA_minimum)
 		{
 			newState.transitionTableMap.emplace(p.first, statesSetsMap.find(p.second)->second);
 		}
-		DFA_minimum.statesMap.push_back(newState);
+		DFA_minimum.statesMap.insert({ newState.num,newState });
 	}
 }
 
 void split_to_sets(const DFA& dfa)//生成最小化后的状态集合
 {
 	auto& finalStatesMap = dfa.finalStatesMap;
-	auto& statesMap = dfa.statesMap;
+	//auto& statesMap = dfa.statesMap;
+
+	vector<DFAState> statesMap;
+	for (const auto& s : dfa.statesMap)
+	{
+		statesMap.push_back(s.second);
+	}
+
 
 	for (const auto& p : finalStatesMap)//遍历终态，收集终态
 	{
@@ -95,10 +102,10 @@ void split_to_sets(const DFA& dfa)//生成最小化后的状态集合
 	unordered_set<int> tempSet;
 	for (const auto& e : statesMap)//收集非终态
 	{
-		if (finalStatesMap.find(e.second.num) == finalStatesMap.end())//如果当前状态是非终态
+		if (finalStatesMap.find(e.num) == finalStatesMap.end())//如果当前状态是非终态
 		{
-			tempSet.insert(e.second.num);//非终态的状态标号放在一起
-			statesSetsMap.emplace(e.second.num, count);
+			tempSet.insert(e.num);//非终态的状态标号放在一起
+			statesSetsMap.emplace(e.num, count);
 		}
 	}
 
