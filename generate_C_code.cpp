@@ -33,17 +33,13 @@ int generate_C_code(vector<pair<int*, int>>& arrays, vector<vector<string>>& end
 
 	out << "#include<string.h>" << endl;
 	out << "#define START_STATE " << startState << endl;
-	/*输出P1*/
 	out << codeBegin;
 	
-	/*函数声明*/
+	//函数声明
 	out << "char* getCharPtr(char* fileName);" << endl;
 	out << "int findAction(int action);" << endl; 
-	//out << "void addToken(int token);" << endl; /*将token加入Token序列*/
-	//out << "void comment();" << endl; /*comment函数，啥都不做*/
 
-
-	/*依次输出ec表,base表,next表,accept表*/
+	//依次输出ec表,base表,next表,accept表
 	vector<string> array_name;
 	array_name.push_back(string("yy_ec"));
 	array_name.push_back(string("yy_base"));
@@ -53,9 +49,10 @@ int generate_C_code(vector<pair<int*, int>>& arrays, vector<vector<string>>& end
 	for (int i = 0; i < 4; i++)
 	{
 		print_array(array_name[i], arrays[i].second, arrays[i].first, out);
+		out << endl;
 	}
 
-	/*定义变量*/
+	//定义变量
 	out << "int yy_current_state = START_STATE;" << endl;
 	out << "int yy_last_accepting_state = -1;" << endl;
 	out << "char *yy_cp = NULL;" << endl;
@@ -64,14 +61,14 @@ int generate_C_code(vector<pair<int*, int>>& arrays, vector<vector<string>>& end
 	out << "int isEnd = 0;" << endl;
 	out << "int yy_c = -1;" << endl;
 	out << "int correct = 1;" << endl;
+	out << endl;
 
-
-	/*初始化动作*/
+	//初始化
 	out << "void lex_init(char* fileName)" << endl;
 	out << "{" << endl;
-	/*调用char* getCharPtr(char* fileName)得到文件字符指针*/
-	out << "	yy_cp = getCharPtr(fileName);" << endl;
+	out << "	yy_cp = getCharPtr(fileName);" << endl;//调用char* getCharPtr(char* fileName)得到文件字符指针
 	out << "}" << endl;
+	out << endl;
 
 	if (mode == YACC_TEST)
 	{
@@ -81,107 +78,114 @@ int generate_C_code(vector<pair<int*, int>>& arrays, vector<vector<string>>& end
 
 	if (mode == LEX_TEST)
 	{
-		out << "int main(int argc,char** argv)" << endl;
+		out << "int main( int argc, char** argv )" << endl;
 		out << "{" << endl;
-		out << "	if(argc==2)" << endl;
+		out << "	if( argc == 2 )" << endl;
 		out << "	{" << endl;
 		out << "		lex_init(argv[1]);" << endl;
 		out << "	}" << endl;
-		out << "	else{" << endl;
+		out << "	else" << endl;
+		out << "	{" << endl;
 		out << "		printf(\"ERROR: invalid argument!\\n\");" << endl;
 		out << "		return -1;" << endl;
 		out << "	}" << endl;
+		out << endl;
 	}
 
+	out << "	if (isEnd && correct)" << endl;
+	out << "	{" << endl;
+	out << "		return -1;" << endl;
+	out << "	}" << endl;
+	out << "	else if (isEnd && !correct)" << endl;
+	out << "	{" << endl;
+	out << "		return -2;" << endl;
+	out << "	}" << endl;
+	out << endl;
 
-	out << "		if (isEnd && correct)" << endl;
+	out << "	int result = 0;" << endl;
+	out << "	while (*yy_cp != 0)" << endl;
+	out << "	{" << endl;
+	out << "		yy_c = yy_ec[(int)*yy_cp];" << endl;
+	out << "		if (yy_accept[yy_current_state])" << endl;
 	out << "		{" << endl;
-	out << "			return -1;" << endl;
+	out << "			yy_last_accepting_state = yy_current_state;" << endl;
+	out << "			yy_last_accepting_cpos = yy_cp;" << endl;
 	out << "		}" << endl;
-	out << "		else if (isEnd && !correct)" << endl;
+	out << "		if (yy_next[yy_base[yy_current_state] + yy_c] == -1 && yy_last_accepting_state != -1)" << endl;
 	out << "		{" << endl;
-	out << "			return -2;" << endl;
-	out << "		}" << endl;
-	out << "		int result = 0;" << endl;
-	out << "		while (*yy_cp != 0) {" << endl;
-	out << "			yy_c = yy_ec[(int)*yy_cp];" << endl;
-	out << "			if (yy_accept[yy_current_state])" << endl;
-	out << "			{" << endl;
-	out << "				yy_last_accepting_state = yy_current_state;" << endl;
-	out << "				yy_last_accepting_cpos = yy_cp;" << endl;
-	out << "			}" << endl;
-	out << "			if (yy_next[yy_base[yy_current_state] + yy_c] == -1 && yy_last_accepting_state != -1)" << endl;
-	out << "			{" << endl;
-	out << "				yy_current_state = yy_last_accepting_state;" << endl;
-	out << "				yy_cp = yy_last_accepting_cpos;" << endl;
-	out << "				yy_act = yy_accept[yy_current_state];" << endl;
-	out << "				result = findAction(yy_act);" << endl;
+	out << "			yy_current_state = yy_last_accepting_state;" << endl;
+	out << "			yy_cp = yy_last_accepting_cpos;" << endl;
+	out << "			yy_act = yy_accept[yy_current_state];" << endl;
+	out << "			result = findAction(yy_act);" << endl;
 
 	if (mode == YACC_TEST)
 	{
-		out << "				if (result != -1)" << endl;
-		out << "				{" << endl;
-		out << "					yy_current_state = START_STATE;" << endl;
-		out << "					yy_last_accepting_state = -1;" << endl;
-		out << "					++yy_cp;" << endl;
-		out << "					yy_current_state = yy_next[yy_base[yy_current_state] + yy_c];" << endl;
-		out << "					break;" << endl;
-		out << "				}" << endl;
-		out << "				if (result == -1)" << endl;
-		out << "				{" << endl;
-		out << "					yy_current_state = START_STATE;" << endl;
-		out << "					yy_last_accepting_state = -1;" << endl;
-		out << "					++yy_cp;" << endl;
-		out << "					yy_current_state = yy_next[yy_base[yy_current_state] + yy_c];" << endl;
-		out << "					continue;" << endl;
-		out << "				}" << endl;
-	}
-	else if (mode == LEX_TEST)
-	{
-		out << "				printf(\" \");" << endl;
+		out << "			if (result != -1)" << endl;
+		out << "			{" << endl;
+		out << "				yy_current_state = START_STATE;" << endl;
+		out << "				yy_last_accepting_state = -1;" << endl;
+		out << "				++yy_cp;" << endl;
+		out << "				yy_current_state = yy_next[yy_base[yy_current_state] + yy_c];" << endl;
+		out << "				break;" << endl;
+		out << "			}" << endl;
+		out << "			if (result == -1)" << endl;
+		out << "			{" << endl;
 		out << "				yy_current_state = START_STATE;" << endl;
 		out << "				yy_last_accepting_state = -1;" << endl;
 		out << "				++yy_cp;" << endl;
 		out << "				yy_current_state = yy_next[yy_base[yy_current_state] + yy_c];" << endl;
 		out << "				continue;" << endl;
+		out << "			}" << endl;
+	}
+	else if (mode == LEX_TEST)
+	{
+		out << "			printf(\" \");" << endl;
+		out << "			yy_current_state = START_STATE;" << endl;
+		out << "			yy_last_accepting_state = -1;" << endl;
+		out << "			++yy_cp;" << endl;
+		out << "			yy_current_state = yy_next[yy_base[yy_current_state] + yy_c];" << endl;
+		out << "			continue;" << endl;
 
 	}
 
-	out << "				}" << endl;
-	out << "					if (yy_next[yy_base[yy_current_state] + yy_c] == -1 && yy_last_accepting_state == -1)" << endl;
-	out << "				{" << endl;
-	out << "	printf(\"ERROR DETECTED IN INPUT FILE !\");" << endl;
+	out << "		}" << endl;
+	out << "		if (yy_next[yy_base[yy_current_state] + yy_c] == -1 && yy_last_accepting_state == -1)" << endl;
+	out << "		{" << endl;
+	out << "			printf(\"ERROR DETECTED IN INPUT FILE !\");" << endl;
 
 	if (mode == LEX_TEST)
 	{
-		out << "	return -1;" << endl;
+		out << "			return -1;" << endl;
 	}
+	out << "		}" << endl;
+	out << "		if (yy_next[yy_base[yy_current_state] + yy_c] != -1) " << endl;
+	out << "		{" << endl;
+	out << "			yy_current_state = yy_next[yy_base[yy_current_state] + yy_c];" << endl;
+	out << "			++yy_cp;" << endl;
+	out << "		}" << endl;
 	out << "	}" << endl;
-	out << "if (yy_next[yy_base[yy_current_state] + yy_c] != -1) " << endl;
-	out << "{" << endl;
-	out << "		yy_current_state = yy_next[yy_base[yy_current_state] + yy_c];" << endl;
-	out << "	++yy_cp;" << endl;
-	out << "	}" << endl;
-	out << "}" << endl;
-	out << "if (*yy_cp == 0) {" << endl;
-	out << "isEnd = 1;" << endl;
-	out << "	if (yy_accept[yy_current_state] && yy_cp == yy_last_accepting_cpos + 1)" << endl;
-	out << "{" << endl;
-	out << "	yy_act = yy_accept[yy_current_state];" << endl;
-	out << "	result = findAction(yy_act);" << endl;
-	out << "}" << endl;
-	out << "else " << endl;
-	out << "{" << endl;
-	out << "	printf(\"ERROR DETECTED IN INPUT FILE !\");" << endl;
-	out << "	correct = 0;" << endl;
+	out << endl;
+	out << "	if (*yy_cp == 0)" << endl;
+	out << "	{" << endl;
+	out << "		isEnd = 1;" << endl;
+	out << "		if (yy_accept[yy_current_state] && yy_cp == yy_last_accepting_cpos + 1)" << endl;
+	out << "		{" << endl;
+	out << "			yy_act = yy_accept[yy_current_state];" << endl;
+	out << "			result = findAction(yy_act);" << endl;
+	out << "		}" << endl;
+	out << "		else " << endl;
+	out << "		{" << endl;
+	out << "			printf(\"ERROR DETECTED IN INPUT FILE !\");" << endl;
+	out << "			correct = 0;" << endl;
 
 	if (mode == LEX_TEST)
 	{
-		out << "	return -1;" << endl;
+		out << "			return -1;" << endl;
 	}
-	out << "}" << endl;
 
-	out << "}" << endl;
+	out << "		}" << endl;
+	out << "	}" << endl;
+
 	if (mode == LEX_TEST)
 	{
 		out << "	return 0;" << endl;
@@ -190,36 +194,40 @@ int generate_C_code(vector<pair<int*, int>>& arrays, vector<vector<string>>& end
 	{
 		out << "	return result;" << endl;
 	}
-	out << "}" << endl;/*lex_mian函数结束*/
+	out << "}" << endl;
+	out << endl;
+	//lex_mian函数结束
 
-	/*int findAction(int action)函数*/
+
+	//int findAction(int action)函数
 	out << "int findAction(int action)" << endl;
 	out << "{" << endl;
 	out << "	switch (action) " << endl;/*根据endVec打印switch语句*/
-	out << "{" << endl;
-	out << "case 0:" << endl;
-	/*...此处省略了一些东西*/
-	out << "break;" << endl;
+	out << "	{" << endl;
+	out << "		case 0:" << endl;
+	out << "		break;" << endl;
 
 	for (int i = 0; i < endVec.size(); i++)
 	{
-		out << "case " << i + 1 << ":" << endl;
+		out << "		case " << i + 1 << ":" << endl;
 		for (int j = 0; j < endVec[i].size(); j++)
 		{
-			out << endVec[i][j] << endl;
+			out << "		" << endVec[i][j] << endl;
 		}
-		out << "break;" << endl;
+		out << "		break;" << endl;
 	}
 
 	out << "		default:" << endl;
 	out << "		break;" << endl;
-	out << "	}" << endl; /*int findAction(int state）函数的下括号*/
+	out << "	}" << endl; 
 	out << "	return -1;" << endl;
-	out << "	}" << endl; /*int findAction(int action)函数的下括号*/
+	out << "}" << endl; 
+	out << endl;
+	//int findAction(int state）函数结束
 
-
-	/*char* getCharPtr(char* fileName)函数*/
-	out << "char* getCharPtr(char* fileName){" << endl;
+	//char* getCharPtr(char* fileName)函数(获取输入lex文件内容
+	out << "char* getCharPtr(char* fileName)" << endl;
+	out << "{" << endl;
 	out << "	char* cp=NULL;" << endl;
 	out << "	FILE *fp;" << endl;
 	out << "	fp=fopen(fileName,\"r\");" << endl;
@@ -228,18 +236,19 @@ int generate_C_code(vector<pair<int*, int>>& arrays, vector<vector<string>>& end
 	out << "		printf(\"can't open file\");" << endl;
 	out << "		exit(0);" << endl;
 	out << "	}" << endl;
+	out << endl;
 	out << "	fseek(fp,0,SEEK_END);" << endl;
-	out << "	int flen = ftell(fp);" << endl; /* 得到文件大小 */
-	out << "	cp = (char *)malloc(flen + 1);" << endl; /* 根据文件大小动态分配内存空间 */
+	out << "	int flen = ftell(fp);" << endl; //得到文件大小
+	out << "	cp = (char *)malloc(flen + 1);" << endl; //根据文件大小动态分配内存空间
 	out << "	if (cp == NULL)" << endl;
 	out << "	{" << endl;
 	out << "		fclose(fp);" << endl;
 	out << "		return 0;" << endl;
 	out << "	}" << endl;
-	out << "	rewind(fp);" << endl; /* 定位到文件开头 */
+	out << "	rewind(fp);" << endl; //定位到文件开头
 	out << "	memset(cp,0,flen+1);" << endl;
-	out << "	fread(cp, sizeof(char), flen, fp);" << endl; /* 一次性读取全部文件内容 */
-	out << "	cp[flen] = 0; " << endl;/* 字符串结束标志 */
+	out << "	fread(cp, sizeof(char), flen, fp);" << endl; //一次性读取全部文件内容
+	out << "	cp[flen] = 0; " << endl;//设置字符串结束标志
 	out << "	return cp;" << endl;
 	out << "}" << endl;
 
@@ -249,7 +258,7 @@ int generate_C_code(vector<pair<int*, int>>& arrays, vector<vector<string>>& end
 	return 0;
 }
 
-void print_array(string name, int size, const int* value, ofstream& out)
+void print_array(string name, int size, const int* value, ofstream& out)//打表
 {
 	const int* array_buf = value;
 	out << "static int	" << name << "[" << size << "]" << " =" << endl;
@@ -268,3 +277,4 @@ void print_array(string name, int size, const int* value, ofstream& out)
 	}
 	out << "};" << endl;
 }
+
