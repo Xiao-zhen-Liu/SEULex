@@ -36,6 +36,21 @@ char convert_escape_char(const char& c) {
 	}
 }
 
+bool is_escape_char(size_t i, const string& regex) {
+	char tmp;
+	size_t j = i - 1;
+	int ct = 0;
+	// Look back, find how many consective '\\'
+	while (j >= 0)
+	{
+		tmp = regex[j];
+		if (tmp != '\\') break;
+		else ct++, j--;
+	}
+	// Odd number of '\\'s before this char mean this is an escape char
+	return (ct & 1);
+}
+
 // Used only for curly brackets
 void process_escape_inside_square_brackets(string& charClass) {
 	string rst;
@@ -66,7 +81,7 @@ bool process_curly_brackets(string& regex, unordered_map<string, string>& termsM
 	for (size_t i = 0; i < regex.length(); i++)
 	{
 		cur = regex[i];
-		if (cur == '{' && ((i > 0 && regex[i - 1] != '\\') || i == 0)) {
+		if (cur == '{' && !is_escape_char(i, regex)) {
 			// Entered bracket.
 			if (!inside) {
 				inside = true;
@@ -77,7 +92,7 @@ bool process_curly_brackets(string& regex, unordered_map<string, string>& termsM
 				return false;
 			}
 		}
-		if (cur == '}' && ((i > 0 && regex[i - 1] != '\\') || i == 0)) {
+		if (cur == '}' && !is_escape_char(i, regex)) {
 			if (inside) {
 				// Exit bracket.
 				inside = false;
@@ -141,6 +156,7 @@ bool get_char_set_string(const string& content, string& rst) {
 		}
 		else charset.insert(cur);
 	}
+
 	// Process negation
 	if (neg) {
 		set<char> tempset;
@@ -174,7 +190,7 @@ bool process_square_brackets(string& regex) {
 	for (size_t i = 0; i < regex.length(); i++)
 	{
 		cur = regex[i];
-		if (cur == '[' && ((i > 0 && regex[i - 1] != '\\') || i == 0)) {
+		if (cur == '[' && !is_escape_char(i, regex)) {
 			// Entered bracket.
 			if (!inside) {
 				inside = true;
@@ -186,7 +202,7 @@ bool process_square_brackets(string& regex) {
 				return false;
 			}
 		}
-		if (cur == ']' && ((i > 0 && regex[i - 1] != '\\') || i == 0)) {
+		if (cur == ']' && !is_escape_char(i, regex)) {
 			if (inside) {
 				// Exit bracket.
 				inside = false;
@@ -212,7 +228,7 @@ void process_match_all(string& regex) {
 	for (size_t i = 0; i < regex.length(); i++)
 	{
 		cur = regex[i];
-		if (cur == '.' && (i == 0 || regex[i - 1] != '\\')) {
+		if (cur == '.' && !is_escape_char(i, regex)) {
 			string tmp;
 			get_char_set_string("^\n", tmp);
 			rst += tmp;
@@ -221,21 +237,6 @@ void process_match_all(string& regex) {
 		rst += cur;
 	}
 	regex = rst;
-}
-
-bool is_escape_char(size_t i, const string& regex) {
-	char tmp;
-	size_t j = i - 1;
-	int ct = 0;
-	// Look back, find how many consective '\\'
-	while (j >= 0)
-	{
-		tmp = regex[j];
-		if (tmp != '\\') break;
-		else ct++, j--;
-	}
-	// Odd number of '\\'s before this char mean this is an escape char
-	return (ct & 1);
 }
 
 // SHOULD BLANK BE COUNTED IN?
@@ -446,6 +447,7 @@ bool parse_regex(vector<RERule>& rulesVec, const vector<string>& regedTermsVec, 
 		process_match_all(r.regex);
 		if (!process_special_operators(r.regex)) return false;
 		add_dot_splitter(r.regex);
+		//cout << r.regex << endl;
 		if (!convert_to_suffix_form(r.regex)) return false;
 	}
 }
