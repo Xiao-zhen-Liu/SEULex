@@ -147,6 +147,7 @@ void convert_NFA_2_DFA(NFA &nfa,DFA &dfa)
 	e_closure(s0.NFAStatesSet, nfa.statesMap);
 	//将s0加入DFA中
 	dfa.statesMap.insert(pair<int, DFAState>(s0.num,s0));
+	dfa.startState = s0.num;
 
 	queue<int> unmarked_DFAStates;//未加标记的DFA状态的编号
 	unmarked_DFAStates.push(s0.num);

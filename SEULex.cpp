@@ -70,9 +70,9 @@ int main(int argc, char** argv)
 
 	convert_rules_2_NFA(regexRulesVec, finalNFA); cout << "Finished converting to NFA." << endl;
 	convert_NFA_2_DFA(finalNFA, originDFA); cout << "Finished converting to DFA." << endl;
-	minimize_DFA(originDFA,minimunDFA); cout << "Finished DFA minimization." << endl;
-	convert_DFA_2_array(minimunDFA,arrays,endVec); cout << "Finished DFA to array." << endl;
-	generate_C_code(arrays, endVec, codeBegin, codeEnd, minimunDFA.startState, mode); cout << "Finished generating C code." << endl;
+	minimize_DFA(originDFA, minimunDFA); cout << "Finished DFA minimization." << endl;
+	convert_DFA_2_array(originDFA, arrays, endVec); cout << "Finished DFA to array." << endl;
+	generate_C_code(arrays, endVec, codeBegin, codeEnd, originDFA.startState, mode); cout << "Finished generating C code." << endl;
 
 	/*for (int i = 0; i < minimunDFA.statesMap.size(); i++)
 	{

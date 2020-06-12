@@ -8,6 +8,8 @@ using std::queue;
 using std::stack;
 using std::vector;
 using std::string;
+using std::endl;
+using std::cout;
 
 static bool scan(const vector<DFAState>&);
 static void split_to_sets(const DFA& dfa);

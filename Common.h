@@ -36,7 +36,7 @@ struct NFAState
 
 struct NFA
 {
-	int startState;
+	int startState = 0;
 	std::unordered_map<int, std::vector<std::string>> finalStatesMap;//<终态标号，对应的动作>
 	std::unordered_map<int, NFAState> statesMap;//NFA中结点的标号与其state的对应关系
 };
@@ -57,7 +57,7 @@ struct DFAState
 
 struct DFA
 {
-	int startState;
+	int startState = 0;
 	std::unordered_map<int, std::vector<std::string>> finalStatesMap;//存储终态和对应的动作
 	std::unordered_map<int, DFAState> statesMap;//DFA中结点的标号与其state的对应关系
 };

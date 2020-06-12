@@ -104,7 +104,7 @@ bool read_parse_lex_file(string path, vector<string>& regedTermsVec, unordered_m
 	ifstream inStm;
 	inStm.open(path);
 	if (!inStm) {
-		cout << "File <" << path << "> NOT FOUND. FAILED." << endl;
+		cout << "File < " << path << "> NOT FOUND. FAILED." << endl;
 		return false;
 	}
 
@@ -132,7 +132,7 @@ bool read_parse_lex_file(string path, vector<string>& regedTermsVec, unordered_m
 		case BEGIN:
 			if (lineBuf.compare("%{") == 0) state = CONSTANT_DECLARATIONS;
 			else {
-				cout << "ERROR: No entry token <%{> at file start." << endl;
+				cout << "File <" << path << "> NOT FOUND. FAILED." << endl;
 				error = true;
 			}
 			break;
