@@ -50,7 +50,7 @@ int main(int argc, char** argv)
 		return -1;
 	}
 
-	if (read_parse_lex_file("lex.l", regedTermsVec, regdMap, regexRulesVec, codeBegin, codeEnd)) cout << "Finished Lex File Reading." << endl;
+	if (read_parse_lex_file("lex_mini.l", regedTermsVec, regdMap, regexRulesVec, codeBegin, codeEnd)) cout << "Finished Lex File Reading." << endl;
 	if (parse_regex(regexRulesVec, regedTermsVec, regdMap)) cout << "Finished Regex parsing." << endl;
 	/* for (auto s : leadingConstantsVec) cout << s << endl;
 	 for (auto pair : regdMap) {
@@ -71,4 +71,9 @@ int main(int argc, char** argv)
 	minimize_DFA(originDFA,minimunDFA); cout << "Finished DFA minimization." << endl;
 	convert_DFA_2_array(minimunDFA,arrays,endVec); cout << "Finished DFA to array." << endl;
 	generate_C_code(arrays, endVec, codeBegin, codeEnd, minimunDFA.startState, mode); cout << "Finished generating C code." << endl;
+
+	/*for (int i = 0; i < minimunDFA.statesMap.size(); i++)
+	{
+		cout << minimunDFA.
+	}*/
 }
