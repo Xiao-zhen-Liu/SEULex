@@ -101,7 +101,7 @@ bool move(const unordered_set<int>& NFAStatesSet, const unordered_map<int, NFASt
 	return flag;
 }
 
-bool find_actions(const unordered_set<int>& NFAStatesSet, unordered_map<int, vector<string>>& finalStatesMap_NFA, string& actions)//参数1：DFA状态中的NFA状态；参数2：NFA中的终态<终态标号，对应的动作>；参数3：动作
+bool find_actions(const unordered_set<int>& NFAStatesSet, unordered_map<int, vector<string>>& finalStatesMap_NFA, vector<string>& actions)//参数1：DFA状态中的NFA状态；参数2：NFA中的终态<终态标号，对应的动作>；参数3：动作
 {
 	decltype(finalStatesMap_NFA.find(0)) finalState_Iter;//最终选择的终态
 	bool find = false;//是否已经在这个DFA结点中找到了终态
@@ -124,7 +124,7 @@ bool find_actions(const unordered_set<int>& NFAStatesSet, unordered_map<int, vec
 	}
 	if (find)//确定终态
 	{
-		actions = finalState_Iter->second[0];//动作的选择
+		actions = finalState_Iter->second;//动作的选择
 		return true;
 	}
 	else return false;
@@ -191,12 +191,10 @@ void convert_NFA_2_DFA(NFA &nfa,DFA &dfa)
 					dfa.statesMap.insert(pair<int, DFAState>(newState.num, newState));
 					unmarked_DFAStates.push(newState.num);//新结点等待处理
 					//判断是否是终态并找确定终态对应动作
-					string actions;
+					vector<string> actions;
 					if (find_actions(newState.NFAStatesSet, nfa.finalStatesMap, actions))//如果包含终态
 					{ 
-						vector<string> act;
-						act.push_back(actions);
-						dfa.finalStatesMap.insert({ newState.num, act });//决定这个dfa终态对应的动作
+						dfa.finalStatesMap.insert({ newState.num, actions });//决定这个dfa终态对应的动作
 					}
 				}
 				dfa.statesMap[this_state].transitionTableMap.insert(pair<char, int>(inputC, next_state));//DFA图上加一条边

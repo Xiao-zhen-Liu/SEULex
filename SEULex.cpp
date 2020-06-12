@@ -50,7 +50,7 @@ int main(int argc, char** argv)
 		return -1;
 	}
 
-	if (read_parse_lex_file("lex_mini.l", regedTermsVec, regdMap, regexRulesVec, codeBegin, codeEnd)) cout << "Finished Lex File Reading." << endl;
+	if (read_parse_lex_file("lex_noSPACE.l", regedTermsVec, regdMap, regexRulesVec, codeBegin, codeEnd)) cout << "Finished Lex File Reading." << endl;
 	if (parse_regex(regexRulesVec, regedTermsVec, regdMap)) cout << "Finished Regex parsing." << endl;
 	/* for (auto s : leadingConstantsVec) cout << s << endl;
 	 for (auto pair : regdMap) {
