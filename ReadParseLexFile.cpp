@@ -104,7 +104,7 @@ bool read_parse_lex_file(string path, vector<string>& regedTermsVec, unordered_m
 	ifstream inStm;
 	inStm.open(path);
 	if (!inStm) {
-		cout << "File <lex.l> NOT FOUND. FAILED." << endl;
+		cout << "File <" << path << "> NOT FOUND. FAILED." << endl;
 		return false;
 	}
 
