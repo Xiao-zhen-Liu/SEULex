@@ -7,19 +7,23 @@ using namespace std;
 static void print_array(string name, int size, const int* value, ofstream& out);
 /*pl(),单行输出函数*/
 
-
+struct Token
+{
+	string token_type;
+	string token_value;
+};
 
 /*生成.c文件,arrays为包含多个相关数组的容器，endVec为终态对应的动作*/
 int generate_C_code(vector<pair<int*, int>>& arrays, vector<vector<string>>& endVec, string& codeBegin, string& codeEnd, int startState, int mode)
 {
 	ofstream out;
-	if (mode == 0)
+	if (mode == 0)//lex mode
 	{
 		out.open("lex.c", ios::out);
 	}
-	if (mode == 1)
+	if (mode == 1)//yacc mode
 	{
-		out.open("lex.c", ios::out);
+		out.open("lex.cpp", ios::out);
 	}
 	/*首先判断size的大小是否为4*/
 	if (arrays.size() != 4)
@@ -28,11 +32,16 @@ int generate_C_code(vector<pair<int*, int>>& arrays, vector<vector<string>>& end
 	}
 	/*主函数的开始*/
 	out << "#define _CRT_SECURE_NO_WARNINGS" << endl;
-	//out << "#include\"stdio.h\"" << endl;
-	out << "#include\"stdlib.h\"" << endl;
-
-	out << "#include<string.h>" << endl;
 	out << "#define START_STATE " << startState << endl;
+	//out << "#include\"stdio.h\"" << endl;
+	out << "#include \"stdlib.h\"" << endl;
+	out << "#include<string.h>" << endl;
+	if (mode == YACC_TEST)
+	{
+		out << "#include <string>" << endl;
+		out << "#include <vector>" << endl;
+		out << "using namespace std;" << endl;
+	}
 	out << codeBegin;
 	
 	//函数声明
@@ -52,6 +61,16 @@ int generate_C_code(vector<pair<int*, int>>& arrays, vector<vector<string>>& end
 		out << endl;
 	}
 
+	if (mode == YACC_TEST)
+	{
+		//定义数据结构
+		out << "struct Token" << endl;
+		out << "{" << endl;
+		out << "	string token_type;" << endl;
+		out << "	string token_value;" << endl;
+		out << "};" << endl;
+	}
+
 	//定义变量
 	out << "int yy_current_state = START_STATE;" << endl;
 	out << "int yy_last_accepting_state = -1;" << endl;
@@ -61,6 +80,13 @@ int generate_C_code(vector<pair<int*, int>>& arrays, vector<vector<string>>& end
 	out << "int isEnd = 0;" << endl;
 	out << "int yy_c = -1;" << endl;
 	out << "int correct = 1;" << endl;
+
+	if (mode == YACC_TEST)
+	{
+		out << "vector <Token> tokens;" << endl;
+		out << "string str_temp = \"\";" << endl;
+	}
+
 	out << endl;
 
 	//初始化
@@ -106,10 +132,15 @@ int generate_C_code(vector<pair<int*, int>>& arrays, vector<vector<string>>& end
 	out << "	while (*yy_cp != 0)" << endl;
 	out << "	{" << endl;
 	out << "		yy_c = yy_ec[(int)*yy_cp];" << endl;
+	if (mode == YACC_TEST)
+	{
+		out << "		str_temp = str_temp + *(yy_cp);" << endl;
+	}
 	out << "		if (yy_accept[yy_current_state])" << endl;
 	out << "		{" << endl;
 	out << "			yy_last_accepting_state = yy_current_state;" << endl;
 	out << "			yy_last_accepting_cpos = yy_cp;" << endl;
+	//out << "			str_temp = str_temp + *(yy_cp);" << endl;
 	out << "		}" << endl;
 	out << "		if (yy_next[yy_base[yy_current_state] + yy_c] == -1 && yy_last_accepting_state != -1)" << endl;
 	out << "		{" << endl;
@@ -171,6 +202,10 @@ int generate_C_code(vector<pair<int*, int>>& arrays, vector<vector<string>>& end
 	out << "		if (yy_accept[yy_current_state] && yy_cp == yy_last_accepting_cpos + 1)" << endl;
 	out << "		{" << endl;
 	out << "			yy_act = yy_accept[yy_current_state];" << endl;
+	if (mode == YACC_TEST)
+	{
+		out << "			str_temp += *(yy_cp - 1);" << endl;
+	}
 	out << "			result = findAction(yy_act);" << endl;
 	out << "		}" << endl;
 	out << "		else " << endl;
@@ -186,13 +221,13 @@ int generate_C_code(vector<pair<int*, int>>& arrays, vector<vector<string>>& end
 	out << "		}" << endl;
 	out << "	}" << endl;
 
-	if (mode == LEX_TEST)
+	if (mode == LEX_TEST)//lex
 	{
 		out << "	return 0;" << endl;
 	}
-	else 
+	else //yacc
 	{
-		out << "	return result;" << endl;
+		out << "	return tokens;" << endl;
 	}
 	out << "}" << endl;
 	out << endl;
@@ -202,20 +237,79 @@ int generate_C_code(vector<pair<int*, int>>& arrays, vector<vector<string>>& end
 	//int findAction(int action)函数
 	out << "int findAction(int action)" << endl;
 	out << "{" << endl;
-	out << "	switch (action) " << endl;/*根据endVec打印switch语句*/
-	out << "	{" << endl;
-	out << "		case 0:" << endl;
-	out << "		break;" << endl;
 
-	for (int i = 0; i < endVec.size(); i++)
+	if (mode == LEX_TEST)
 	{
-		out << "		case " << i + 1 << ":" << endl;
-		for (int j = 0; j < endVec[i].size(); j++)
-		{
-			out << "		" << endVec[i][j] << endl;
-		}
+		out << "	switch (action) " << endl;/*根据endVec打印switch语句*/
+		out << "	{" << endl;
+		out << "		case 0:" << endl;
 		out << "		break;" << endl;
+		for (int i = 0; i < endVec.size(); i++)
+		{
+			out << "		case " << i + 1 << ":" << endl;
+			for (int j = 0; j < endVec[i].size(); j++)
+			{
+				out << "		" << endVec[i][j] << endl;//正常输出
+			}
+			out << "		break;" << endl;
+		}
 	}
+
+	//———————————————————————这段是yacc用的——————————————————————————
+	if (mode == YACC_TEST)
+	{
+		string s;
+		//int space_flag = 0;//等于1的时候说明是注释或者空格
+		out << "	Token temp;" << endl;
+		out << "	string s;" << endl;
+		out << "	string temp_s;" << endl;
+		out << "	switch (action) " << endl;/*根据endVec打印switch语句*/
+		out << "	{" << endl;
+		out << "		case 0:" << endl;
+		out << "		break;" << endl;
+
+		for (int i = 0; i < endVec.size(); i++)
+		{
+			out << "		case " << i + 1 << ":" << endl;
+			for (int j = 0; j < endVec[i].size(); j++)
+			{
+				out << "		" << endVec[i][j] << endl;//正常输出
+
+				//这段有一部分应该是写在.c里面的，要在每个接受态添一段，把当前的token记录下来
+				if (endVec[i][j].find_first_of('p', 0) == 0)//如果是printf这一行，把动作切出来
+				{
+					s = endVec[i][j].erase(0, 8);//删掉printf("
+					s.erase(s.end() - 1);//删掉;
+					s.erase(s.end() - 1);//删掉)
+					s.erase(s.end() - 1);//删掉"
+					//temp.token_type = s;
+					//给一个判断，如果s是注释/空格，那就不要加进去了（给个flag，置为无效
+					if (s == "SPACE" || s == "MULTI_LINE_COMMENT" || s == "SINGLE_LINE_COMMENT")
+					{
+						//space_flag = 1;
+						out << "		str_temp = str_temp[str_temp.size()-1];" << endl;//对str_temp的重置
+						out << "		break;" << endl;
+						out << endl;
+					}
+					else
+					{
+						//space_flag = 0;
+						out << "		s = \"" << s << "\";" << endl;
+						//out << "		str_temp.erase(str_temp.end() - 1);" << endl;
+						out << "		temp_s = str_temp;" << endl;
+						out << "		temp_s.erase(temp_s.end() - 1);" << endl;
+						out << "		temp.token_type = s;" << endl;
+						out << "		temp.token_value = temp_s;" << endl;
+						out << "		str_temp = str_temp[str_temp.size()-1];" << endl;
+						out << "		tokens.push_back(temp);" << endl;
+						out << "		break;" << endl;
+						out << endl;
+					}
+				}
+			}
+		}
+	}
+	//———————————————————————这段是yacc用的——————————————————————————
 
 	out << "		default:" << endl;
 	out << "		break;" << endl;

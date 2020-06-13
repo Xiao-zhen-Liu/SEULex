@@ -338,3 +338,6 @@ ASALocalRun/
 
 # BeatPulse healthcheck temp database
 healthchecksdb
+/lex.cpp
+/lex2.cpp
+/lex3.cpp
