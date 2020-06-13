@@ -55,7 +55,7 @@ DFA最小化算法二：
 
 void minimize_DFA(const DFA& DFA_origin, DFA& DFA_minimum) 
 {
-	split_to_sets(DFA_origin);//划分
+	split_to_sets(DFA_origin);//划分：将每个终态单独存入一个集合中，其余非终态放入一个集合
 
 	//设置初态
 	DFA_minimum.startState = statesSetsMap.find(DFA_origin.startState)->second;
@@ -85,6 +85,7 @@ void minimize_DFA(const DFA& DFA_origin, DFA& DFA_minimum)
 
 void split_to_sets(const DFA& dfa)//生成最小化后的状态集合
 {
+	//设置终态
 	auto& finalStatesMap = dfa.finalStatesMap;
 	//auto& statesMap = dfa.statesMap;
 
@@ -93,7 +94,6 @@ void split_to_sets(const DFA& dfa)//生成最小化后的状态集合
 	{
 		statesMap.push_back(s.second);
 	}
-
 
 	for (const auto& p : finalStatesMap)//遍历终态，收集终态
 	{

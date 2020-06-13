@@ -3,9 +3,8 @@
 
 using namespace std;
 
-/*打印数组，name为数组名，size为数组大小，value为数组值，out为写入的文件流*/
+//打印数组，name为数组名，size为数组大小，value为数组值，out为写入的文件流
 static void print_array(string name, int size, const int* value, ofstream& out);
-/*pl(),单行输出函数*/
 
 struct Token
 {
@@ -13,7 +12,7 @@ struct Token
 	string token_value;
 };
 
-/*生成.c文件,arrays为包含多个相关数组的容器，endVec为终态对应的动作*/
+//生成.c文件,arrays为包含多个相关数组的容器，endVec为终态对应的动作
 int generate_C_code(vector<pair<int*, int>>& arrays, vector<vector<string>>& endVec, string& codeBegin, string& codeEnd, int startState, int mode)
 {
 	ofstream out;
@@ -23,14 +22,14 @@ int generate_C_code(vector<pair<int*, int>>& arrays, vector<vector<string>>& end
 	}
 	if (mode == 1)//yacc mode
 	{
-		out.open("lex.cpp", ios::out);
+		out.open("lex.h", ios::out);
 	}
-	/*首先判断size的大小是否为4*/
+	//首先判断size的大小是否为4
 	if (arrays.size() != 4)
 	{
 		return -1;
 	}
-	/*主函数的开始*/
+	//主函数的开始
 	out << "#define _CRT_SECURE_NO_WARNINGS" << endl;
 	out << "#define START_STATE " << startState << endl;
 	//out << "#include\"stdio.h\"" << endl;
@@ -80,6 +79,7 @@ int generate_C_code(vector<pair<int*, int>>& arrays, vector<vector<string>>& end
 	out << "int isEnd = 0;" << endl;
 	out << "int yy_c = -1;" << endl;
 	out << "int correct = 1;" << endl;
+	out << "int flag_mlc = 0;" << endl;
 
 	if (mode == YACC_TEST)
 	{
@@ -98,7 +98,7 @@ int generate_C_code(vector<pair<int*, int>>& arrays, vector<vector<string>>& end
 
 	if (mode == YACC_TEST)
 	{
-		out << "int yy_lex()" << endl;
+		out << "vector<Token> yy_lex(char* fileName)" << endl;
 		out << "{" << endl;
 	}
 
@@ -116,17 +116,30 @@ int generate_C_code(vector<pair<int*, int>>& arrays, vector<vector<string>>& end
 		out << "		return -1;" << endl;
 		out << "	}" << endl;
 		out << endl;
-	}
 
-	out << "	if (isEnd && correct)" << endl;
-	out << "	{" << endl;
-	out << "		return -1;" << endl;
-	out << "	}" << endl;
-	out << "	else if (isEnd && !correct)" << endl;
-	out << "	{" << endl;
-	out << "		return -2;" << endl;
-	out << "	}" << endl;
-	out << endl;
+		out << "	if (isEnd && correct)" << endl;
+		out << "	{" << endl;
+		out << "		return -1;" << endl;
+		out << "	}" << endl;
+		out << "	else if (isEnd && !correct)" << endl;
+		out << "	{" << endl;
+		out << "		return -2;" << endl;
+		out << "	}" << endl;
+		out << endl;
+	}
+	if (mode == YACC_TEST)
+	{
+		//out << "	lex_init(fileName);" << endl << endl;
+		out << "	if (isEnd && correct)" << endl;
+		out << "	{" << endl;
+		out << "		return tokens;" << endl;
+		out << "	}" << endl;
+		out << "	else if (isEnd && !correct)" << endl;
+		out << "	{" << endl;
+		out << "		return tokens;" << endl;
+		out << "	}" << endl;
+		out << endl;
+	}
 
 	out << "	int result = 0;" << endl;
 	out << "	while (*yy_cp != 0)" << endl;
@@ -147,6 +160,15 @@ int generate_C_code(vector<pair<int*, int>>& arrays, vector<vector<string>>& end
 	out << "			yy_current_state = yy_last_accepting_state;" << endl;
 	out << "			yy_cp = yy_last_accepting_cpos;" << endl;
 	out << "			yy_act = yy_accept[yy_current_state];" << endl;
+	out << "			if (flag_mlc == 1)" << endl;
+	out << "			{" << endl;
+	out << "				flag_mlc = 0;" << endl;
+	out << "				yy_current_state = START_STATE;" << endl;
+	out << "				yy_last_accepting_state = -1;" << endl;
+	out << "				++yy_cp;" << endl;
+	out << "				yy_current_state = yy_next[yy_base[yy_current_state] + yy_c];" << endl;
+	out << "				continue;" << endl;
+	out << "			}" << endl;
 	out << "			result = findAction(yy_act);" << endl;
 
 	if (mode == YACC_TEST)
@@ -240,7 +262,7 @@ int generate_C_code(vector<pair<int*, int>>& arrays, vector<vector<string>>& end
 
 	if (mode == LEX_TEST)
 	{
-		out << "	switch (action) " << endl;/*根据endVec打印switch语句*/
+		out << "	switch (action) " << endl;//根据endVec打印switch语句
 		out << "	{" << endl;
 		out << "		case 0:" << endl;
 		out << "		break;" << endl;
@@ -263,7 +285,8 @@ int generate_C_code(vector<pair<int*, int>>& arrays, vector<vector<string>>& end
 		out << "	Token temp;" << endl;
 		out << "	string s;" << endl;
 		out << "	string temp_s;" << endl;
-		out << "	switch (action) " << endl;/*根据endVec打印switch语句*/
+		//out << "	int flag_mult_line_comment = 0;" << endl;//对于多行注释的特殊处理：如果接收到多行注释，置一个flag为有效，遇到有效的flag时，这个终结态不做任何动作
+		out << "	switch (action) " << endl;//根据endVec打印switch语句
 		out << "	{" << endl;
 		out << "		case 0:" << endl;
 		out << "		break;" << endl;
@@ -271,6 +294,12 @@ int generate_C_code(vector<pair<int*, int>>& arrays, vector<vector<string>>& end
 		for (int i = 0; i < endVec.size(); i++)
 		{
 			out << "		case " << i + 1 << ":" << endl;
+			/*out << "		if (flag_mult_line_comment == 1)" << endl;
+			out << "		{" << endl;
+			out << "			str_temp = str_temp[str_temp.size()-1];" << endl;
+			out << "			flag_mult_line_comment = 0;" << endl;
+			out << "			break;" << endl;
+			out << "		}" << endl;*/
 			for (int j = 0; j < endVec[i].size(); j++)
 			{
 				out << "		" << endVec[i][j] << endl;//正常输出
@@ -287,6 +316,10 @@ int generate_C_code(vector<pair<int*, int>>& arrays, vector<vector<string>>& end
 					if (s == "SPACE" || s == "MULTI_LINE_COMMENT" || s == "SINGLE_LINE_COMMENT")
 					{
 						//space_flag = 1;
+						/*if (s == "MULTI_LINE_COMMENT")
+						{
+							out << "		flag_mult_line_comment = 1;" << endl;
+						}*/
 						out << "		str_temp = str_temp[str_temp.size()-1];" << endl;//对str_temp的重置
 						out << "		break;" << endl;
 						out << endl;
@@ -364,7 +397,7 @@ void print_array(string name, int size, const int* value, ofstream& out)//打表
 		{
 			out << ",";
 		}
-		if (i % 10 == 0)
+		if (i % 20 == 0)//1行20个
 		{
 			out << endl;
 		}

@@ -341,3 +341,8 @@ healthchecksdb
 /lex.cpp
 /lex2.cpp
 /lex3.cpp
+/lex5.c
+/lex.h
+/lex_lastest.cpp
+/lex_new.cpp
+/lex_noS.cpp

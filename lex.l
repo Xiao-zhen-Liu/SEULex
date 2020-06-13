@@ -325,6 +325,7 @@ L?\"(\\.|[^\"\n])*\"	{
 
 void comment(){
 	char c,prev=0;
+	flag_mlc = 1;
 	while(++yy_cp!=0)
 	{
 		c=*yy_cp;
