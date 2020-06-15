@@ -64,7 +64,7 @@ struct DFA
 
 const std::string OPERATOR_CHARS("\\[]^-?.*+|()$/{}%<>");
 
-const std::string ALL_CHARS("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!\"#%'()*+,-./:;<=>\?[\\]^{|}_ \n\t\v\f~&");
+const std::string ALL_CHARS("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!\"#%'()*+,-.:;<=>\?[\\]^{|}_ \n\t\v\f~&/");
 
 
 #endif // !COMMON_H

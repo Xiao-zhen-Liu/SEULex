@@ -58,7 +58,7 @@ void process_escape_inside_square_brackets(string& charClass) {
 	bool flag = false;
 	for (size_t i = 0; i < charClass.length(); i++) {
 		cur = charClass[i];
-		if (cur == '\\')
+		if (cur == '\\' && !is_escape_char(i, charClass))
 		{
 			flag = true;
 			continue;
@@ -447,7 +447,6 @@ bool parse_regex(vector<RERule>& rulesVec, const vector<string>& regedTermsVec, 
 		process_match_all(r.regex);
 		if (!process_special_operators(r.regex)) return false;
 		add_dot_splitter(r.regex);
-		//cout << r.regex << endl;
 		if (!convert_to_suffix_form(r.regex)) return false;
 	}
 }

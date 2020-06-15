@@ -26,14 +26,15 @@ int main(int argc, char** argv)
 	DFA originDFA;
 	DFA minimunDFA;
 	int mode = -1;
-	string input, codeBegin, codeEnd;
+	string input, codeBegin, codeEnd, path;
 	map<string, string> terms;
 	vector<pair<int*, int>> arrays;//<表（指针），表的大小>
 	vector<vector<string>> endVec;
 
-	if (argc == 2)//argc: 整数,用来统计运行程序时送给main函数的命令行参数的个数
+	if (argc == 3)//argc: 整数,用来统计运行程序时送给main函数的命令行参数的个数
 	{
-		input = string(argv[1]);//argv[1] 指向在DOS命令行中执行程序名后的第一个字符串
+		path = string(argv[1]);
+		input = string(argv[2]);//argv[1] 指向在DOS命令行中执行程序名后的第一个字符串
 		if (input == "lex") {
 			mode = 0;
 		}
@@ -50,7 +51,7 @@ int main(int argc, char** argv)
 		return -1;
 	}
 
-	if (read_parse_lex_file("lex.l", regedTermsVec, regdMap, regexRulesVec, codeBegin, codeEnd)) cout << "Finished Lex File Reading." << endl;
+	if (read_parse_lex_file(path, regedTermsVec, regdMap, regexRulesVec, codeBegin, codeEnd)) cout << "Finished Lex File Reading." << endl;
 	if (parse_regex(regexRulesVec, regedTermsVec, regdMap)) cout << "Finished Regex parsing." << endl;
 	/* for (auto s : leadingConstantsVec) cout << s << endl;
 	 for (auto pair : regdMap) {
@@ -68,8 +69,8 @@ int main(int argc, char** argv)
 
 	convert_rules_2_NFA(regexRulesVec, finalNFA); cout << "Finished converting to NFA." << endl;
 	convert_NFA_2_DFA(finalNFA, originDFA); cout << "Finished converting to DFA." << endl;
-	minimize_DFA(originDFA,minimunDFA); cout << "Finished DFA minimization." << endl;
-	convert_DFA_2_array(minimunDFA,arrays,endVec); cout << "Finished DFA to array." << endl;
+	minimize_DFA(originDFA, minimunDFA); cout << "Finished DFA minimization." << endl;
+	convert_DFA_2_array(minimunDFA, arrays, endVec); cout << "Finished DFA to array." << endl;
 	generate_C_code(arrays, endVec, codeBegin, codeEnd, minimunDFA.startState, mode); cout << "Finished generating C code." << endl;
 
 	/*for (int i = 0; i < minimunDFA.statesMap.size(); i++)

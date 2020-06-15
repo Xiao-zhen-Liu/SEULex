@@ -44,7 +44,7 @@ int generate_C_code(vector<pair<int*, int>>& arrays, vector<vector<string>>& end
 	out << codeBegin;
 	
 	//函数声明
-	out << "char* getCharPtr(char* fileName);" << endl;
+	out << "char* getCharPtr(const char* fileName);" << endl;
 	out << "int findAction(int action);" << endl; 
 
 	//依次输出ec表,base表,next表,accept表
@@ -90,7 +90,7 @@ int generate_C_code(vector<pair<int*, int>>& arrays, vector<vector<string>>& end
 	out << endl;
 
 	//初始化
-	out << "void lex_init(char* fileName)" << endl;
+	out << "void lex_init(const char* fileName)" << endl;
 	out << "{" << endl;
 	out << "	yy_cp = getCharPtr(fileName);" << endl;//调用char* getCharPtr(char* fileName)得到文件字符指针
 	out << "}" << endl;
@@ -98,7 +98,7 @@ int generate_C_code(vector<pair<int*, int>>& arrays, vector<vector<string>>& end
 
 	if (mode == YACC_TEST)
 	{
-		out << "vector<Token> yy_lex(char* fileName)" << endl;
+		out << "vector<Token> yy_lex(const char* fileName)" << endl;
 		out << "{" << endl;
 	}
 
@@ -129,7 +129,7 @@ int generate_C_code(vector<pair<int*, int>>& arrays, vector<vector<string>>& end
 	}
 	if (mode == YACC_TEST)
 	{
-		//out << "	lex_init(fileName);" << endl << endl;
+		out << "	lex_init(fileName);" << endl << endl;
 		out << "	if (isEnd && correct)" << endl;
 		out << "	{" << endl;
 		out << "		return tokens;" << endl;
@@ -302,7 +302,6 @@ int generate_C_code(vector<pair<int*, int>>& arrays, vector<vector<string>>& end
 			out << "		}" << endl;*/
 			for (int j = 0; j < endVec[i].size(); j++)
 			{
-				out << "		" << endVec[i][j] << endl;//正常输出
 
 				//这段有一部分应该是写在.c里面的，要在每个接受态添一段，把当前的token记录下来
 				if (endVec[i][j].find_first_of('p', 0) == 0)//如果是printf这一行，把动作切出来
@@ -339,6 +338,9 @@ int generate_C_code(vector<pair<int*, int>>& arrays, vector<vector<string>>& end
 						out << endl;
 					}
 				}
+				else {
+					out << "		" << endVec[i][j] << endl;//正常输出
+				}
 			}
 		}
 	}
@@ -353,7 +355,7 @@ int generate_C_code(vector<pair<int*, int>>& arrays, vector<vector<string>>& end
 	//int findAction(int state）函数结束
 
 	//char* getCharPtr(char* fileName)函数(获取输入lex文件内容
-	out << "char* getCharPtr(char* fileName)" << endl;
+	out << "char* getCharPtr(const char* fileName)" << endl;
 	out << "{" << endl;
 	out << "	char* cp=NULL;" << endl;
 	out << "	FILE *fp;" << endl;
